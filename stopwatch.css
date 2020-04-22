@@ -1,0 +1,9 @@
+#startstopButton {
+    padding: 0;
+    border: none;
+    background: none;
+    font-size: xx-large;
+}
+#timeremaining {
+    font-size: xx-large;
+}
