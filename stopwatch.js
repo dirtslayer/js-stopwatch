@@ -14,7 +14,6 @@ class JSTimer extends EventTarget {
         this.intervalID = 'stopped';
         this.startMilli = startMilli;
         this.milliLeft = startMilli;
-
     }
 
     /** 
@@ -33,13 +32,6 @@ class JSTimer extends EventTarget {
     }
 
     /** 
-    * Sends stopped message to all listeners
-    */
-    broadcastStop = () => {
-        this.dispatchEvent(new Event('stopped'));
-    }
-
-    /** 
     * Start the timer
     *
     */   
@@ -54,17 +46,25 @@ class JSTimer extends EventTarget {
     stop = () => {
         clearInterval(this.intervalID);
         this.intervalID = 'stopped';
-        this.broadcastStop();
+        this.dispatchEvent(new Event('stopped'));
     }
 
     isRunning = () => {
         return (this.intervalID != 'stopped');
     }
 
+    reset = () => {
+        const { startMilli } = this;
+        this.milliLeft = startMilli;
+        const x = startMilli;
+        const updateEvent = new Event('update');
+        updateEvent.data =  { startMilli, milliLeft:x };
+        this.dispatchEvent(updateEvent);
+    }
 }
 
 /**
-* JSTimerView - Abstract View - listens for tick events
+* JSTimerView - Abstract View - listens for events
 */
 class JSTimerView {
 
@@ -72,7 +72,7 @@ class JSTimerView {
     * Create a timer view
     * @param {HTMLElement} element - the element that is listening for timer events
     * @param {JSTimer} jstimerSource - the timer to listen too 
-    * @param {Array} events - list of events to listen for ['tick','stopped']
+    * @param {Array} events - list of events to listen for ['tick','stopped','update']
     */  
     constructor(element, jstimerSource, events) {
         this.element = element;
@@ -89,27 +89,31 @@ class JSTimerView {
                 this.doStop(e);
             });
         }
-        
+
+        if ( events.includes('update') ) {
+            jstimerSource.addEventListener('update', (e) => {
+                this.doUpdate(e);
+            });
+        }      
     }
 
     /** 
-    * abstract method placeholder to handle tick messages from JSTimerSource
+    * abstract methods placeholder to handle tick messages from JSTimerSource
     * @param {Event} e - event that encapsulates the data
     */
     doTick = (e) => {
         console.log('warning: abstract view received tick message');
         console.dir(e);
     }
-
-    
-    /** 
-    * abstract method placeholder to handle tick messages from JSTimerSource
-    * @param {Event} e - event that encapsulates the data
-    */
    doStop = (e) => {
         console.log('warning: abstract view received stop message');
         console.dir(e);
     }
+    doUpdate = (e) => {
+        console.log('warning: abstract view received update message');
+        console.dir(e);
+    }
+
 
 }
 /**
@@ -139,7 +143,14 @@ class StartStopButton extends JSTimerView {
     doStop = (e) => {
         this.element.innerText = '▶️';
     }
+}
 
+class ResetButton {
+    constructor(button,jstimer) {
+        button.addEventListener('click', () => {
+            jstimer.reset();
+        } )
+    }
 }
 
 /**
@@ -147,19 +158,108 @@ class StartStopButton extends JSTimerView {
 * @extends JSTimerView
 */
 class TimerTextDisplay extends JSTimerView {
+    
     doTick = (e) => {
         const { milliLeft } = e.data;
         this.element.innerText = milliLeft / 100;
     }
+
+    doUpdate = (e) => {
+        const { startMilli } = e.data; 
+        this.element.innerText = startMilli / 100;      
+    }
 }
 
+class TimerBarDisplay extends JSTimerView {
+    doTick = (e) => {
+        const { startMilli, milliLeft } = e.data;
+        this.element.style.width = `${Math.floor(milliLeft * 100 / startMilli)}px` ;
+    }
+
+    doUpdate = (e) => {
+        const { startMilli, milliLeft } = e.data;
+        this.element.style.width = `${Math.floor(milliLeft * 100 / startMilli)}px`;      
+    }
+}
+
+function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+    var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
+  
+    return {
+      x: centerX + (radius * Math.cos(angleInRadians)),
+      y: centerY + (radius * Math.sin(angleInRadians))
+    };
+  }
+  
+  function describeArc(x, y, radius, startAngle, endAngle){
+  
+      var start = polarToCartesian(x, y, radius, endAngle);
+      var end = polarToCartesian(x, y, radius, startAngle);
+  
+      var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+  
+      var d = [
+          "M", start.x, start.y, 
+          "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
+      ].join(" ");
+  
+      return d;       
+  }
+  
+  window.onload = function() {
+    document.getElementById("arc2").setAttribute("d", describeArc(145, 135, 80, 0, 359.999));
+    document.getElementById("arc1").setAttribute("d", describeArc(145, 135, 80, 0, 359.999));
+  };
+  
+  class TimerArcDisplay extends JSTimerView {
+    doTick = (e) => {
+        const { startMilli, milliLeft } = e.data;
+
+        this.element.setAttribute("d", describeArc(145, 135, 80, 0, milliLeft * 359.99 / startMilli));
+    }
+
+    doUpdate = (e) => {
+        const { startMilli, milliLeft } = e.data;
+        this.element.setAttribute("d", describeArc(145, 135, 80, 0, milliLeft * 359.99 / startMilli));   
+    }
+}
+
+
+const toggleinputON = () => {
+    document.querySelector("#setclock").style.display = 'block';
+    document.querySelector("#timeremaining").style.display = 'none'
+    document.querySelector("#setclock").focus();
+}
+
+const toggleinputOFF = () => {
+    document.querySelector("#setclock").style.display = 'none';
+    document.querySelector("#timeremaining").style.display = 'block'
+}
 /** 
 * main - setup timers, controllers and views JSTimer / JSView
 */
-main = () => {
     const timer = new JSTimer(6000);
     const startbutton = new StartStopButton(document.querySelector("#startstopButton"),timer,['stopped']); 
-    const textdisplay = new TimerTextDisplay(document.querySelector("#timeremaining"),timer,['tick']);
-}
+    const textdisplay = new TimerTextDisplay(document.querySelector("#timeremaining"),timer,['tick','update']);
+    const resetbutton = new ResetButton(document.querySelector('#resetButton'),timer);
+    const bardisplay = new TimerBarDisplay(document.querySelector('#bar'),timer,['tick','update']);
+    const arcdisplay = new TimerArcDisplay(document.querySelector('#arc1'),timer,['tick','update']);
+  
+    const resetwithinput = () => {
+        const x = document.querySelector("#setclock").value;
+        toggleinputOFF();
+        timer.stop();
+        timer.startMilli = x * 100;
+        timer.reset();
+        console.log(x);
+    }
 
-main();
+    document.querySelector("#setclock").addEventListener("keyup", event => {
+        if(event.key !== "Enter") return; // Use `.key` instead.
+       toggleinputOFF();
+       resetwithinput(); // Things you want to do.
+        event.preventDefault(); // No need to `return false;`.
+    });
+
+    document.querySelector("#setclock").addEventListener("focusout", resetwithinput);
+

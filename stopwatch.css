@@ -1,9 +1,51 @@
-#startstopButton {
-    padding: 0;
-    border: none;
+* {
+    margin: 0px;
+    border: 0px;
+    padding: 0px;
+    box-sizing: border-box;  
+}
+
+button {
+    
     background: none;
     font-size: xx-large;
+    width: 50px;
+
 }
-#timeremaining {
+
+button:focus {outline:0;}
+
+#timeremaining, input {
     font-size: xx-large;
+    font-weight: 900;
+    font-family: 'Major Mono Display', monospace;
+    text-align: right;
+    width: 100px;
+    background-color: #77add7;
 }
+body {
+    height: 600px;
+}
+#bar {
+    height:5px;
+    width:100px;
+    background-color: #0078d7;
+}
+#box {
+    position: absolute;
+    top:100px;
+    left:100px;
+}
+
+input {
+    display:none;
+}
+
+svg {
+    z-index: -1;
+    width: 350px;
+    height: 350px;
+    position: absolute; 
+    left: 5px;
+    top: 5px;
+  }

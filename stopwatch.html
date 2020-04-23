@@ -5,12 +5,14 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>js-stopwatch </title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="stopwatch.css">
 </head>
 <body>
-    <h1> Stopwatch.js </h1>
-    <button type="button" id="startstopButton">▶️</button>
-    <div id="timeremaining">60</div>
+ 
+  <svg><path id="arc2" fill="none" stroke="#77add7" stroke-width="10" />
+    <path id="arc1" fill="none" stroke="#0078d7" stroke-width="10" /></svg><div id="box"><input type="text" id="setclock" name="setclock"><div id="timeremaining" onclick="toggleinputON()">60</div><div id="bar"> </div><button type="button" id="startstopButton">▶️</button><button type="button" id="resetButton">🔄️</button></div>
+    
     <script src='stopwatch.js'></script>
 </body>
 </html>
