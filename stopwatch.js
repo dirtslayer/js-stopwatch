@@ -182,6 +182,9 @@ class TimerBarDisplay extends JSTimerView {
     }
 }
 
+/** 
+* Arc helper funtions swiped from here: https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
+*/
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
     var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
   
@@ -206,15 +209,21 @@ function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
       return d;       
   }
   
+/** 
+* Draw svg arcs
+*/
   window.onload = function() {
     document.getElementById("arc2").setAttribute("d", describeArc(145, 135, 80, 0, 359.999));
     document.getElementById("arc1").setAttribute("d", describeArc(145, 135, 80, 0, 359.999));
   };
-  
+
+/**
+* Connect arcs to timer
+* @extends JSTimerView
+*/
   class TimerArcDisplay extends JSTimerView {
     doTick = (e) => {
         const { startMilli, milliLeft } = e.data;
-
         this.element.setAttribute("d", describeArc(145, 135, 80, 0, milliLeft * 359.99 / startMilli));
     }
 
@@ -224,13 +233,18 @@ function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
     }
 }
 
-
+/** 
+* When they click text show input box instead
+*/
 const toggleinputON = () => {
     document.querySelector("#setclock").style.display = 'block';
     document.querySelector("#timeremaining").style.display = 'none'
     document.querySelector("#setclock").focus();
 }
 
+/** 
+* When they are done with input box show time remaining
+*/
 const toggleinputOFF = () => {
     document.querySelector("#setclock").style.display = 'none';
     document.querySelector("#timeremaining").style.display = 'block'
@@ -245,6 +259,7 @@ const toggleinputOFF = () => {
     const bardisplay = new TimerBarDisplay(document.querySelector('#bar'),timer,['tick','update']);
     const arcdisplay = new TimerArcDisplay(document.querySelector('#arc1'),timer,['tick','update']);
   
+
     const resetwithinput = () => {
         const x = document.querySelector("#setclock").value;
         toggleinputOFF();
@@ -256,7 +271,6 @@ const toggleinputOFF = () => {
 
     document.querySelector("#setclock").addEventListener("keyup", event => {
         if(event.key !== "Enter") return; // Use `.key` instead.
-       toggleinputOFF();
        resetwithinput(); // Things you want to do.
         event.preventDefault(); // No need to `return false;`.
     });
