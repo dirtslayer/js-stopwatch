@@ -5,14 +5,19 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>js-stopwatch </title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="stopwatch.css">
 </head>
 <body>
  
   <svg><path id="arc2" fill="none" stroke="#77add7" stroke-width="10" />
-    <path id="arc1" fill="none" stroke="#0078d7" stroke-width="10" /></svg><div id="box"><input type="text" id="setclock" name="setclock"><div id="timeremaining" onclick="toggleinputON()">60</div><div id="bar"> </div><button type="button" id="startstopButton">▶️</button><button type="button" id="resetButton">🔄️</button></div>
+    <path id="arc1" fill="none" stroke="#0078d7" stroke-width="10" /></svg><div id="box">
+      <input type="text" id="setclock" name="setclock"><div id="timeremaining" onclick="toggleinputON()">60</div>
+      <div id="bar"> </div><button type="button" id="startstopButton"><i class="fa fa-play" aria-hidden="true"></i></button>
+      <button type="button" id="resetButton"><i class="fa fa-refresh" aria-hidden="true"></i></button></div>
     
     <script src='stopwatch.js'></script>
+    
 </body>
 </html>

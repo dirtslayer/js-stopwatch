@@ -131,17 +131,17 @@ class StartStopButton extends JSTimerView {
         button.addEventListener('click', () => {
             if ( jstimer.isRunning() ) {
                 jstimer.stop();
-                button.innerText = '▶️';
+                button.innerHTML = `<i class="fa fa-play" aria-hidden="true"></i>`;
             } else {
                 jstimer.start();
-                button.innerText = '⏹️';
+                button.innerHTML = `<i class="fa fa-pause" aria-hidden="true"></i>`;
             }
         }
         );       
     }
 
     doStop = (e) => {
-        this.element.innerText = '▶️';
+        this.element.innerHTML = `<i class="fa fa-play" aria-hidden="true"></i>`;
     }
 }
 
